@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Solar - Portal Astronómico</title>
+    <style>
+        /* CSS Reset & Variantes de Diseño (Metodología BEM) */
+        *, *::before, *::after {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        :root {
+            /* Paleta Espacial / Sistema Solar */
+            --solar-sun: #ffb703;
+            --solar-sun-glow: rgba(255, 183, 3, 0.3);
+            --solar-orbit: #219ebc;
+            --solar-flare: #fb8500;
+            --solar-bg-dark: #030712;
+            --solar-card-bg: #0f172a;
+            --solar-surface: #1e293b;
+            --solar-text: #f8fafc;
+            --solar-text-muted: #94a3b8;
+            --solar-border: #334155;
+            
+            --radius-md: 8px;
+            --radius-lg: 14px;
+            --shadow-solar: 0 4px 20px -2px rgba(255, 183, 3, 0.2);
+            --transition-standard: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: var(--solar-text);
+            background-color: var(--solar-bg-dark);
+            background-image: 
+                radial-gradient(circle at 10% 10%, rgba(255, 183, 3, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 90%, rgba(33, 158, 188, 0.08) 0%, transparent 40%);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        /* Encabezado y Menú Dinámico CSS */
+        .header {
+            background-color: rgba(15, 23, 42, 0.95);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            border-bottom: 2px solid var(--solar-sun);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.6);
+        }
+
+        .navbar {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 75px;
+        }
+
+        .navbar__brand {
+            font-size: 1.5rem;
+            font-weight: 800;
+            color: var(--solar-sun);
+            text-decoration: none;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar__brand::before {
+            content: '☀️';
+            font-size: 1.4rem;
+        }
+
+        .navbar__toggle {
+            display: none;
+        }
+
+        .navbar__toggle-label {
+            display: none;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .navbar__toggle-icon {
+            display: block;
+            width: 26px;
+            height: 3px;
+            background-color: var(--solar-sun);
+            position: relative;
+            transition: var(--transition-standard);
+        }
+
+        .navbar__toggle-icon::before,
+        .navbar__toggle-icon::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: var(--solar-sun);
+            transition: var(--transition-standard);
+        }
+
+        .navbar__toggle-icon::before { top: -8px; }
+        .navbar__toggle-icon::after { top: 8px; }
+
+        .navbar__menu {
+            display: flex;
+            list-style: none;
+            gap: 1.25rem;
+        }
+
+        .navbar__item {
+            position: relative;
+        }
+
+        .navbar__link {
+            color: var(--solar-text);
+            text-decoration: none;
+            padding: 0.6rem 1.1rem;
+            display: block;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition-standard);
+            border-radius: var(--radius-md);
+            border: 1px solid transparent;
+        }
+
+        .navbar__link:hover {
+            color: var(--solar-sun);
+            background-color: var(--solar-surface);
+            border-color: var(--solar-orbit);
+            box-shadow: 0 0 10px var(--solar-sun-glow);
+        }
+
+        /* Submenú Desplegable Dinámico */
+        .navbar__submenu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            background-color: var(--solar-card-bg);
+            list-style: none;
+            min-width: 220px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--solar-orbit);
+            box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(12px);
+            transition: var(--transition-standard);
+        }
+
+        .navbar__item--dropdown:hover .navbar__submenu {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(4px);
+        }
+
+        .navbar__submenu-link {
+            color: var(--solar-text-muted);
+            text-decoration: none;
+            padding: 0.85rem 1.25rem;
+            display: block;
+            font-size: 0.9rem;
+            transition: var(--transition-standard);
+            border-bottom: 1px solid var(--solar-border);
+        }
+
+        .navbar__submenu-link:hover {
+            color: #ffffff;
+            background-color: var(--solar-flare);
+            padding-left: 1.5rem;
+        }
+
+        /* Contenedor Principal */
+        .main {
+            flex: 1;
+            max-width: 1200px;
+            width: 100%;
+            margin: 0 auto;
+            padding: 3rem 1.5rem;
+            display: flex;
+            flex-direction: column;
+            gap: 3.5rem;
+        }
+
+        /* Tarjeta Estilo Sistema Solar */
+        .card {
+            background-color: var(--solar-card-bg);
+            border-radius: var(--radius-lg);
+            padding: 2.25rem;
+            box-shadow: var(--shadow-solar);
+            border: 1px solid var(--solar-border);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, var(--solar-sun), var(--solar-flare));
+        }
+
+        .card__title {
+            font-size: 1.85rem;
+            color: var(--solar-sun);
+            margin-bottom: 1rem;
+            border-bottom: 1px solid var(--solar-border);
+            padding-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .card__text {
+            color: var(--solar-text-muted);
+            margin-bottom: 1rem;
+            font-size: 1rem;
+        }
+
+        /* Cuadrícula de Información */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.75rem;
+            margin-top: 1.5rem;
+        }
+
+        .grid__item {
+            background-color: var(--solar-surface);
+            border: 1px solid var(--solar-border);
+            border-radius: var(--radius-md);
+            padding: 1.75rem;
+            transition: var(--transition-standard);
+        }
+
+        .grid__item:hover {
+            border-color: var(--solar-sun);
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-solar);
+        }
+
+        .grid__title {
+            font-size: 1.25rem;
+            color: var(--solar-text);
+            margin-bottom: 0.75rem;
+        }
+
+        /* Acordeón de Problemas y Soluciones */
+        .accordion {
+            display: flex;
+            flex-direction: column;
+            gap: 1.2rem;
+            margin-top: 1.5rem;
+        }
+
+        .accordion__item {
+            border: 1px solid var(--solar-border);
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background-color: var(--solar-surface);
+            transition: var(--transition-standard);
+        }
+
+        .accordion__item:hover {
+            border-color: var(--solar-orbit);
+        }
+
+        .accordion__toggle {
+            display: none;
+        }
+
+        .accordion__header {
+            padding: 1.25rem 1.5rem;
+            background-color: var(--solar-surface);
+            font-weight: 600;
+            color: var(--solar-text);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            user-select: none;
+            transition: var(--transition-standard);
+        }
+
+        .accordion__header:hover {
+            background-color: rgba(255, 183, 3, 0.1);
+            color: var(--solar-sun);
+        }
+
+        .accordion__header::after {
+            content: '✚';
+            font-size: 1.1rem;
+            color: var(--solar-sun);
+            transition: var(--transition-standard);
+        }
+
+        .accordion__content {
+            max-height: 0;
+            overflow: hidden;
+            padding: 0 1.5rem;
+            transition: max-height 0.35s ease, padding 0.35s ease;
+            background-color: var(--solar-card-bg);
+        }
+
+        .accordion__toggle:checked ~ .accordion__header::after {
+            transform: rotate(45deg);
+            color: var(--solar-flare);
+        }
+
+        .accordion__toggle:checked ~ .accordion__header {
+            background-color: var(--solar-card-bg);
+            color: var(--solar-sun);
+            border-bottom: 1px solid var(--solar-border);
+        }
+
+        .accordion__toggle:checked ~ .accordion__content {
+            max-height: 300px;
+            padding: 1.25rem 1.5rem;
+        }
+
+        /* Pie de Página */
+        .footer {
+            background-color: #020617;
+            color: var(--solar-text-muted);
+            padding: 3.5rem 1.5rem 1.5rem 1.5rem;
+            margin-top: auto;
+            border-top: 2px solid var(--solar-sun);
+        }
+
+        .footer__container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 2.5rem;
+            margin-bottom: 2.5rem;
+        }
+
+        .footer__title {
+            color: var(--solar-sun);
+            font-size: 1.2rem;
+            margin-bottom: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .footer__text {
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+
+        .footer__list {
+            list-style: none;
+        }
+
+        .footer__item {
+            margin-bottom: 0.6rem;
+        }
+
+        .footer__link {
+            color: var(--solar-text-muted);
+            text-decoration: none;
+            transition: var(--transition-standard);
+        }
+
+        .footer__link:hover {
+            color: var(--solar-sun);
+            padding-left: 0.3rem;
+        }
+
+        .footer__bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 1.75rem;
+            border-top: 1px solid var(--solar-border);
+            text-align: center;
+            font-size: 0.875rem;
+        }
+
+        /* Adaptabilidad Móvil */
+        @media (max-width: 768px) {
+            .navbar__toggle-label {
+                display: block;
+            }
+
+            .navbar__menu {
+                position: absolute;
+                top: 75px;
+                left: 0;
+                width: 100%;
+                background-color: var(--solar-card-bg);
+                flex-direction: column;
+                gap: 0;
+                max-height: 0;
+                overflow: hidden;
+                transition: max-height 0.3s ease-in-out;
+                border-bottom: 1px solid var(--solar-border);
+            }
+
+            .navbar__toggle:checked ~ .navbar__menu {
+                max-height: 450px;
+            }
+
+            .navbar__item {
+                width: 100%;
+            }
+
+            .navbar__link {
+                padding: 1rem 1.5rem;
+                border-radius: 0;
+                border-bottom: 1px solid var(--solar-border);
+            }
+
+            .navbar__submenu {
+                position: static;
+                opacity: 1;
+                visibility: visible;
+                transform: none;
+                box-shadow: none;
+                background-color: var(--solar-surface);
+                display: none;
+                border: none;
+                border-radius: 0;
+            }
+
+            .navbar__item--dropdown:hover .navbar__submenu {
+                display: block;
+            }
+
+            .navbar__submenu-link {
+                padding-left: 2.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Encabezado y Navegación Dinámica -->
+    <header class="header">
+        <nav class="navbar">
+            <a href="#" class="navbar__brand">Sistema Solar</a>
+            
+            <input type="checkbox" id="navbar-toggle" class="navbar__toggle">
+            <label for="navbar-toggle" class="navbar__toggle-label">
+                <span class="navbar__toggle-icon"></span>
+            </label>
+
+            <ul class="navbar__menu">
+                <li class="navbar__item">
+                    <a href="#inicio" class="navbar__link">Inicio</a>
+                </li>
+                <li class="navbar__item navbar__item--dropdown">
+                    <a href="#informacion" class="navbar__link">Cuerpos Celestes ▾</a>
+                    <ul class="navbar__submenu">
+                        <li><a href="#planetas-terrestres" class="navbar__submenu-link">Planetas Terrestres</a></li>
+                        <li><a href="#gigantes-gaseosos" class="navbar__submenu-link">Gigantes Gaseosos</a></li>
+                    </ul>
+                </li>
+                <li class="navbar__item">
+                    <a href="#problemas" class="navbar__link">Preguntas y Soluciones</a>
+                </li>
+                <li class="navbar__item">
+                    <a href="#contacto" class="navbar__link">Contacto</a>
+                </li>
+            </ul>
+        </nav>
+    </header>
+
+    <!-- Contenido Principal -->
+    <main class="main">
+
+        <!-- Sección: Información Básica -->
+        <section id="informacion" class="card">
+            <h2 class="card__title">Información Básica del Sistema Solar</h2>
+            <p class="card__text">
+                El <strong>Sistema Solar</strong> es el sistema planetario en el que se encuentran la Tierra y otros objetos astronómicos que giran directa o indirectamente en una órbita alrededor de una única estrella conocida como el <strong>Sol</strong>.
+            </p>
+            <div class="grid">
+                <article class="grid__item" id="planetas-terrestres">
+                    <h3 class="grid__title">🪐 Planetas Terrestres</h3>
+                    <p class="card__text">Mercurio, Venus, Tierra y Marte. Son los planetas más cercanos al Sol, caracterizados por una composición rocosa y metálica de alta densidad.</p>
+                </article>
+                <article class="grid__item" id="gigantes-gaseosos">
+                    <h3 class="grid__title">🌌 Gigantes Gaseosos e Helados</h3>
+                    <p class="card__text">Júpiter, Saturno, Urano y Neptuno. Compuestos principalmente por hidrógeno, helio, agua y metano congelado, conformando la región externa del sistema.</p>
+                </article>
+            </div>
+        </section>
+
+        <!-- Sección: Problemas y Soluciones / Preguntas Frecuentes -->
+        <section id="problemas" class="card">
+            <h2 class="card__title">Problemas Astronómicos y Soluciones Térmicas</h2>
+            <p class="card__text">Respuestas y explicaciones a las incógnitas comunes de la mecánica planetaria:</p>
+
+            <div class="accordion">
+                <!-- Problema 1 -->
+                <div class="accordion__item">
+                    <input type="checkbox" id="problem-1" class="accordion__toggle">
+                    <label for="problem-1" class="accordion__header">¿Por qué Plutón ya no es considerado un planeta principal?</label>
+                    <div class="accordion__content">
+                        <p class="card__text">En 2006, la Unión Astronómica Internacional determinó que un planeta debe haber despejado el entorno de su órbita. Al compartir su zona con el Cinturón de Kuiper, Plutón fue reclasificado como <em>planeta enano</em>.</p>
+                    </div>
+                </div>
+
+                <!-- Problema 2 -->
+                <div class="accordion__item">
+                    <input type="checkbox" id="problem-2" class="accordion__toggle">
+                    <label for="problem-2" class="accordion__header">¿Cómo resisten las sondas espaciales las temperaturas extremas?</label>
+                    <div class="accordion__content">
+                        <p class="card__text">Se utilizan escudos térmicos de carbono, capas reflectantes de oro/aluminio y sistemas de aislamiento dinámico para proteger la instrumentación contra la radiación solar y el frío del espacio profundo.</p>
+                    </div>
+                </div>
+
+                <!-- Problema 3 -->
+                <div class="accordion__item">
+                    <input type="checkbox" id="problem-3" class="accordion__toggle">
+                    <label for="problem-3" class="accordion__header">¿Cómo se evita que la basura espacial colisione con los satélites?</label>
+                    <div class="accordion__content">
+                        <p class="card__text">Redes de radares rastrean constantemente los fragmentos mayores a 10 cm, permitiendo que los satélites efectúen maniobras de corrección orbital mediante pequeños propulsores de control de maniobra.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Pie de Página con Información de Contacto -->
+    <footer id="contacto" class="footer">
+        <div class="footer__container">
+            <div>
+                <h3 class="footer__title">Contacto y Consultas</h3>
+                <p class="footer__text">Desarrollo y divulgación de ciencia, ingeniería y redes.</p>
+                <p class="footer__text">📍 Jocoro, El Salvador</p>
+            </div>
+
+            <div>
+                <h3 class="footer__title">Canales de Información</h3>
+                <ul class="footer__list">
+                    <li class="footer__item">Email: <a href="mailto:contacto@sistemasolar.test" class="footer__link">contacto@sistemasolar.test</a></li>
+                    <li class="footer__item">Teléfono: <a href="tel:+50300000000" class="footer__link">+503 0000-0000</a></li>
+                    <li class="footer__item">GitHub: <a href="https://github.com/arrafaelhs-svg/PROGRAMACION_ESTRUCTURADA" class="footer__link" target="_blank" rel="noopener">github.com/arrafaelhs-svg</a></li>
+                </ul>
+            </div>
+
+            <div>
+                <h3 class="footer__title">Enlaces Rápidos</h3>
+                <ul class="footer__list">
+                    <li class="footer__item"><a href="#inicio" class="footer__link">Inicio</a></li>
+                    <li class="footer__item"><a href="#informacion" class="footer__link">Información Básica</a></li>
+                    <li class="footer__item"><a href="#problemas" class="footer__link">Problemas y Soluciones</a></li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="footer__bottom">
+            <p>© 2026 Sistema Solar Portal. Todos los derechos reservados. Estructurado en un único archivo `index.html` con HTML5 y CSS3 puro.</p>
+        </div>
+    </footer>
+
+</body>
+</html>
